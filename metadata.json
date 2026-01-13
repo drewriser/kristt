@@ -1,0 +1,5 @@
+{
+  "name": "Sora2 批量生成工场",
+  "description": "专业的 Sora 2 视频批量生成仪表板。包含成本控制、串行队列处理和结果下载功能。",
+  "requestFramePermissions": []
+}
