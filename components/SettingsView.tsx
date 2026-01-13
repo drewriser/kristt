@@ -14,11 +14,11 @@ interface Props {
 const PROVIDER_DEFAULTS = {
   apimart: {
     url: 'https://api.apimart.ai',
-    key: 'sk-...' 
+    key: '' 
   },
   kie: {
     url: 'https://api.kie.ai',
-    key: 'b23f1f34b4ade7d00e895ab2c91e2171' // User provided default
+    key: '' 
   }
 };
 
@@ -46,8 +46,8 @@ const SettingsView: React.FC<Props> = ({ config, onUpdateConfig, language, onSet
   const handleProviderChange = (provider: ApiProvider) => {
     const defaults = PROVIDER_DEFAULTS[provider];
     const newUrl = defaults.url;
-    // Suggest the key if switching to Kie, otherwise keep current or prompt
-    const newKey = provider === 'kie' ? defaults.key : localKey; 
+    // Keep current key if switching unless empty, or use default if exists (which is empty now)
+    const newKey = localKey || defaults.key; 
 
     setLocalUrl(newUrl);
     setLocalKey(newKey);
@@ -247,7 +247,7 @@ const SettingsView: React.FC<Props> = ({ config, onUpdateConfig, language, onSet
               {t.save}
             </button>
           </div>
-          <p className="text-xs text-neutral-600">Keys are stored locally.</p>
+          <p className="text-xs text-neutral-600">{t.helpText}</p>
         </div>
       </div>
 

@@ -24,12 +24,24 @@ const PRESET_CHARACTERS: SoraCharacter[] = [
 
 const PRESET_PROMPTS: SoraPrompt[] = [
   {
-    id: 'script_tiktok_beauty',
-    title: 'TikTok Beauty Influencer (Spanish)',
+    id: 'script_tiktok_beauty_v2',
+    title: 'TikTok Beauty Influencer (Spanish/Mexico)',
     content: `Short de TikTok de belleza estilo influencer casero pero high-end, 8K, ritmo rápido y dinámico, secuencia de cámara con toques "selfie" para sensación de confianza personal.
 Protagonista: Chica joven mexicana con cabello magenta-púrpura vibrante y suave (estilo tendencia), piel radiante sin poros, cejas gruesas y bien arregladas (look natural), ojos avellana-verdes. Uñas con manicura francesa blanca impecable (detalle chic).
-Tono general: Amigable, cercano, como recomiendo un producto a la amiga. No hay actitud formal—todo es natural y relatable.`,
-    tags: ['TikTok', 'Beauty', 'Spanish', 'Influencer'],
+Tono general: Amigable, cercano, como recomiendo un producto a la amiga. No hay actitud formal—todo es natural y relatable.
+
+Secuencia del video (con hacks de influencer):
+
+1. Primer plano medio (ángulo selfie 45°): Yo sostengo la recortadora de cejas eléctrica de pluma, rosa-dorado metálico, contra la piel debajo del arco de la ceja. Mano izquierda (con manicura francesa) estiro suavemente la piel temporal (moviéndola un poquito, como hacemos en casa), mano derecha con la herramienta a 45°, haciendo movimientos circulares lentos y sutiles solo debajo de las cejas—mientras miro la cámara como si le dijera "mira cómo lo hago". Agarre delicado, presión suave.
+
+2. Zoom macro extremo (corte súper rápido): Transición instantánea a macro impactante—la punta chapada en oro deslizándose por la piel. Texturas hiperrealistas: poros individuales, vello fino que se quita sin dolor, textura de las cejas intactas. Brillo metálico que refleja la luz (detalle que llama la atención). Duración del macro: 1-2 segundos (no más, para mantener el ritmo de TikTok).
+
+3. Retorno al retrato (ángulo frontal relajado): Cámara se aleja, yo dejo de recortar, bajo la recortadora y sonrío a la cámara—una sonrisa segura, como "ya terminé, mirá qué fácil". Parpadeo natural, piel brillante con luz suave (no demasiado estudio, más como luz de ventana). Fondo: pared de color crema neutra, desenfocada (no distrae, como en mi habitación).
+
+Restricciones estrictas (MÁS IMPORTANTE): La punta dorada nunca toca las cejas principales—siempre 1-2 mm debajo de la línea de contorno inferior, solo para los pelos sueltos debajo del hueso de la ceja. No hay daño a las cejas, todo es seguro y fácil.
+
+Contexto: Anuncio de TikTok México para influencers, ritmo rápido (cada secuencia 3-4 segundos), enfoque en facilidad de uso y resultado visible—lo que la gente busca en un short de recomendación.`,
+    tags: ['TikTok', 'Beauty', 'Spanish', 'Influencer', 'Macro'],
     usageCount: 0,
     createdAt: Date.now()
   }
@@ -84,20 +96,15 @@ const App: React.FC = () => {
         if (!next.provider) { next.provider = 'apimart'; needsUpdate = true; } // Migrate old config
         if (!next.model) { next.model = 'sora-2'; needsUpdate = true; }
         if (next.autoDownload === undefined) { next.autoDownload = true; needsUpdate = true; }
-        // Force update 10s -> 15s if it matches old default
-        if (next.duration === 10) { next.duration = 15; needsUpdate = true; }
         
-        // Ensure API key matches env if not set (for dev convenience)
-        if (!next.apiKey && DEFAULT_CONFIG.apiKey && DEFAULT_CONFIG.apiKey !== 'sk-...') {
-           next.apiKey = DEFAULT_CONFIG.apiKey;
-           needsUpdate = true;
-        }
-
+        // Removed hardcoded key injection. Key persistence is handled by useStickyState (LocalStorage).
+        
         if (needsUpdate) return next;
         return prev;
     });
 
     if (characters.length === 0) setCharacters(PRESET_CHARACTERS);
+    // Reset/Update prompts if empty or older version (simplification: just set if empty or forcing update logic could be complex, for now we set if empty to avoid overwriting user edits)
     if (prompts.length === 0) setPrompts(PRESET_PROMPTS);
   }, []); 
 
@@ -249,7 +256,7 @@ const App: React.FC = () => {
   const activeCount = tasks.filter(t => ['QUEUED','PROCESSING','SUBMITTING'].includes(t.status)).length;
 
   return (
-    <div className="flex h-screen w-full bg-black text-slate-200 font-sans overflow-hidden">
+    <div className="flex flex-col md:flex-row h-screen w-full bg-black text-slate-200 font-sans overflow-hidden">
       <ToastContainer toasts={toasts} onRemove={removeToast} />
       
       <Sidebar 
@@ -260,7 +267,7 @@ const App: React.FC = () => {
       />
 
       <main className="flex-1 flex flex-col h-full relative min-w-0">
-        <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar relative z-10 scroll-smooth">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar relative z-10 scroll-smooth pb-20 md:pb-0">
           {currentView === 'create' && (
             <CreateView 
               config={config} 
@@ -275,7 +282,7 @@ const App: React.FC = () => {
           )}
 
           {currentView === 'queue' && (
-            <div className="min-h-full p-8">
+            <div className="min-h-full p-8 pb-24">
               <h2 className="text-2xl font-light text-white mb-6 tracking-tight">{t.nav.queue}</h2>
               <TaskList 
                 tasks={tasks}
@@ -286,7 +293,7 @@ const App: React.FC = () => {
           )}
 
           {currentView === 'gallery' && (
-            <div className="min-h-full p-8">
+            <div className="min-h-full p-8 pb-24">
                <h2 className="text-2xl font-light text-white mb-6 tracking-tight">{t.nav.gallery}</h2>
                <VideoGallery 
                  videos={tasks.filter(t => t.status === TaskStatus.COMPLETED && t.videoUrl)}
@@ -300,7 +307,7 @@ const App: React.FC = () => {
           )}
 
           {currentView === 'prompts' && (
-             <div className="min-h-full p-8">
+             <div className="min-h-full p-8 pb-24">
                 <h2 className="text-2xl font-light text-white mb-6 tracking-tight">{t.nav.library}</h2>
                 <PromptLibrary 
                   prompts={prompts}
@@ -311,7 +318,7 @@ const App: React.FC = () => {
           )}
 
           {currentView === 'settings' && (
-            <div className="min-h-full p-8">
+            <div className="min-h-full p-8 pb-24">
               <SettingsView 
                 config={config} 
                 onUpdateConfig={(c) => { setConfig(c); addToast('success', t.settings.savedToast); }} 
@@ -321,10 +328,10 @@ const App: React.FC = () => {
             </div>
           )}
           
-          <div className="h-24"></div>
+          <div className="h-24 md:h-24"></div>
         </div>
 
-        <div className="absolute bottom-6 right-6 z-50 flex items-center gap-2">
+        <div className="absolute bottom-20 md:bottom-6 right-6 z-50 flex items-center gap-2">
            <button 
              onClick={() => setIsQueueRunning(!isQueueRunning)}
              className={`flex items-center gap-3 px-4 py-2 rounded-full border backdrop-blur-md transition-all duration-300 shadow-xl group ${

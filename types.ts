@@ -76,17 +76,17 @@ export interface ApiConfig {
 
 export const DEFAULT_CONFIG: ApiConfig = {
   provider: 'apimart',
-  apiKey: 'sk-t2LaxKLMyzBy6GfFXu52bG9swGadBeXPETX5TAsRMwrX6hRD',
+  apiKey: '', // Default is empty, user must input.
   baseUrl: 'https://api.apimart.ai',
   queryEndpointPattern: '/v1/tasks/{id}',
-  historyEndpointPattern: '/v1/tasks', // Default guess
+  historyEndpointPattern: '/v1/tasks', 
   concurrency: 1,
-  autoDownload: true, // Default to true for batch production use case
+  autoDownload: true, 
   
   // Sora Defaults
   model: 'sora-2',
-  aspectRatio: '16:9', // Updated default based on docs
-  duration: 15, // Updated default based on docs
+  aspectRatio: '9:16', // Vertical default
+  duration: 10, // 10s default
   style: 'none',
   isPrivate: false,
 
